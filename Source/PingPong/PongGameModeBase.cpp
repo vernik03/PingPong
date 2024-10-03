@@ -3,6 +3,8 @@
 
 #include "PongGameModeBase.h"
 #include "PongPlayerController.h"
+#include "GameFramework/PlayerStart.h"
+#include <Kismet/GameplayStatics.h>
 
 void APongGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
@@ -10,7 +12,7 @@ void APongGameModeBase::PostLogin(APlayerController* NewPlayer)
 
     NumPlayers++;
 
-    if (NumPlayers >= 2)
+    if (NumPlayers >= PlayersToConnect)
     {
 		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 		{
@@ -21,4 +23,25 @@ void APongGameModeBase::PostLogin(APlayerController* NewPlayer)
 			}
 		}
     }
+}
+
+AActor* APongGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+    TArray<AActor*> PlayerStarts;
+    UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), PlayerStarts);
+
+    for (AActor* PlayerStartActor : PlayerStarts)
+    {
+        APlayerStart* PlayerStart = Cast<APlayerStart>(PlayerStartActor);
+        if (PlayerStart)
+        {
+            if (!PlayerStart->Tags.Contains(FName("IsTaken")))
+            {
+                PlayerStart->Tags.Add(FName("IsTaken"));
+                return PlayerStart;
+            }
+        }
+    }
+
+    return Super::ChoosePlayerStart_Implementation(Player);
 }

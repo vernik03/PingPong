@@ -17,4 +17,10 @@ class PINGPONG_API APongGameModeBase : public AGameModeBase
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 	int32 NumPlayers = 0;	
+
+	UPROPERTY(EditAnywhere)
+	int32 PlayersToConnect = 2;
+
+public:
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 };

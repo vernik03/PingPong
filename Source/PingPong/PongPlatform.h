@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include <EnhancedInputLibrary.h>
 #include "PongPlatform.generated.h"
 
 UCLASS()
@@ -12,20 +13,44 @@ class PINGPONG_API APongPlatform : public APawn
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
 	APongPlatform();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
+    virtual void Tick(float DeltaTime) override;
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    class USceneComponent* Root;
 
-	
-	
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+    class UStaticMeshComponent* PlatformMesh;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+    class UInputAction* MoveAction;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+    class UInputMappingContext* InputMappingContext;
+
+private:
+    UFUNCTION()
+    void MovePlatform(const FInputActionValue& Value);
+
+    UPROPERTY(Replicated)
+    float PlatformPositionY = 0.0f;
+
+    UPROPERTY(EditAnywhere, Category = "Input")
+    float InputMultiplier = 1.0f;
+
+    UPROPERTY(EditAnywhere, Category = "Input")
+    float Limiter = 600.0f;
+
+    UFUNCTION(Server, Reliable)
+    void MovePlatformOnServer(float MovementValue);
+
+    void MovePlatform(float MovementValue);
+
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

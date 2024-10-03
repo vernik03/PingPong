@@ -10,19 +10,23 @@ UCLASS()
 class PINGPONG_API APongBall : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	APongBall();
+
+public:
+    APongBall();
+
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+    UFUNCTION()
+    void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	
-	
+public:
+    virtual void Tick(float DeltaTime) override;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+    class UProjectileMovementComponent* ProjectileMovement;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+    class UStaticMeshComponent* BallMesh;
 };

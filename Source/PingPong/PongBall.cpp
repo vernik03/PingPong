@@ -2,22 +2,71 @@
 
 
 #include "PongBall.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 
-// Sets default values
 APongBall::APongBall()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = true;
+    SetReplicates(true);
+    SetReplicateMovement(true);
 
+    BallMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BallMesh"));
+    RootComponent = BallMesh;
+
+    BallMesh->OnComponentHit.AddDynamic(this, &APongBall::OnHit);
+
+    ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
+    ProjectileMovement->UpdatedComponent = BallMesh;
+    ProjectileMovement->bShouldBounce = true;
+    ProjectileMovement->Bounciness = 1.0f; 
+    ProjectileMovement->Friction = 0.0f;
+    ProjectileMovement->ProjectileGravityScale = 0.0f;
+    ProjectileMovement->BounceVelocityStopSimulatingThreshold = 0.0f;
 }
 
-// Called when the game starts or when spawned
 void APongBall::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
+
+    if (HasAuthority())
+    {
+        FVector InitialDirection = FVector::ZeroVector;
+
+        InitialDirection.X = FMath::RandBool() ? 1.0f : -1.0f;
+        InitialDirection.Y = FMath::FRandRange(-1.0f, 1.0f);
+        InitialDirection.Z = 0.0f;
+        InitialDirection.Normalize();
+
+        ProjectileMovement->Velocity = InitialDirection * ProjectileMovement->InitialSpeed;
+    }
 	
 }
+
+void APongBall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+    FVector NormalImpulse, const FHitResult& Hit)
+{
+    if (!HasAuthority())
+    {
+        return;
+    }
+
+    FVector CurrentVelocity = ProjectileMovement->Velocity;
+
+    if (CurrentVelocity.IsNearlyZero())
+    {
+        return;
+    }
+
+    FVector ReflectedVelocity = FMath::GetReflectionVector(CurrentVelocity, Hit.Normal);
+    ReflectedVelocity = ReflectedVelocity.GetSafeNormal() * CurrentVelocity.Size();
+
+    ProjectileMovement->Velocity = ReflectedVelocity;
+    ProjectileMovement->UpdateComponentVelocity();
+}
+
+
 
 // Called every frame
 void APongBall::Tick(float DeltaTime)
@@ -25,4 +74,3 @@ void APongBall::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-

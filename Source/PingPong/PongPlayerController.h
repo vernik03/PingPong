@@ -15,6 +15,7 @@ class PINGPONG_API APongPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
+	UFUNCTION(Client, Reliable)
 	void StartGame();
 
 	UFUNCTION(BlueprintImplementableEvent)

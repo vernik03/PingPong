@@ -3,8 +3,7 @@
 
 #include "PongPlayerController.h"
 
-void APongPlayerController::StartGame()
+void APongPlayerController::StartGame_Implementation()
 {
-
 	StartGameUI();
 }
