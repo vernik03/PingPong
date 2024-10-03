@@ -54,7 +54,7 @@ void APongPlatform::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void APongPlatform::MovePlatform(const FInputActionValue& Value)
 {
-    const float MovementValue = -Value.Get<float>() * InputMultiplier;
+    const float MovementValue = -FMath::Sign(GetActorLocation().X) * Value.Get<float>() * InputMultiplier;
 
     if (!Controller || MovementValue == 0.0f)
     {

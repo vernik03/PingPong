@@ -30,18 +30,7 @@ void APongBall::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (HasAuthority())
-    {
-        FVector InitialDirection = FVector::ZeroVector;
-
-        InitialDirection.X = FMath::RandBool() ? 1.0f : -1.0f;
-        InitialDirection.Y = FMath::FRandRange(-1.0f, 1.0f);
-        InitialDirection.Z = 0.0f;
-        InitialDirection.Normalize();
-
-        ProjectileMovement->Velocity = InitialDirection * ProjectileMovement->InitialSpeed;
-    }
-	
+    ProjectileMovement->Velocity = FVector::ZeroVector;
 }
 
 void APongBall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -73,4 +62,21 @@ void APongBall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APongBall::StartGame()
+{
+	if (HasAuthority())
+    {
+		SetActorLocation(InitialLocation);
+    
+        FVector InitialDirection = FVector::ZeroVector;
+
+        InitialDirection.X = FMath::RandBool() ? 1.0f : -1.0f;
+        InitialDirection.Y = FMath::FRandRange(-1.0f, 1.0f);
+        InitialDirection.Z = 0.0f;
+        InitialDirection.Normalize();
+
+        ProjectileMovement->Velocity = InitialDirection * ProjectileMovement->InitialSpeed;
+    }
 }

@@ -24,9 +24,15 @@ protected:
 public:
     virtual void Tick(float DeltaTime) override;
 
+    void StartGame();
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
     class UProjectileMovementComponent* ProjectileMovement;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
     class UStaticMeshComponent* BallMesh;
+
+private:
+    UPROPERTY(EditAnywhere, Category = "Movement")
+    FVector InitialLocation;
 };
